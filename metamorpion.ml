@@ -543,144 +543,53 @@ let rec print_node (n: node) =
   print_endline ("Nombre d'enfants : " ^ string_of_int (List.length n.children));
   List.iter print_node n.children
 
+(* Lancement du programme*)
+let choisir_adversaire () =
+  print_endline "Choisissez votre adversaire :";
+  print_endline "1 - IA MCTS";
+  print_endline "2 - IA MinMax";
+  print_endline "3 - Joueur humain";
+  print_string "Votre choix : ";
+  read_int ()
+
+let choisir_premier () =
+  print_endline "Souhaitez-vous commencer ? (1 - Oui, 2 - Non)";
+  print_string "Votre choix : ";
+  read_int () = 1
 
 let () =
-  (* Initialiser l'état et le compteur de coups *)
+  let adversaire = choisir_adversaire () in
+  let joueur_commence = ref (choisir_premier ()) in
+
   let e = ref (init 1 1) in
-  let e_precedent = ref (init 1 1) in
-  let e_intermediaire = ref (init 1 1) in
   let k = ref 0 in
   let d = 4 in
-  let root = ref { state = !e; wins = 0.0; visits = 0; parent = None; children = [] } in (* in
-  print_node !root; *)
-  (* Boucle de jeu *)
-  while (est_gagnant (!e) = None) && (!k < 81) do
+  let root = ref { state = !e; wins = 0.0; visits = 0; parent = None; children = [] } in
+
+  let jouer_adversaire () =
+    match adversaire with
+    | 1 ->
+        if !k <> 0 then root := get_node !e !root;
+        e := jouer_coup_avec_mcts !root 5000 1.41;
+        root := get_node !e !root;
+    | 2 -> e := meilleur_coup_2 !e d Minf Pinf heuristique
+    | _ ->
+        let c = next_move () in
+        e := joue !e c !k
+  in
+
+  while (est_gagnant !e = None) && (!k < 81) do
+    if !joueur_commence then (
+      let c = next_move () in
+      e := joue !e c !k;
+      k := !k + 1
+    );
     
-    (* IA joue avec MCTS *)
-    if !k <> 0 then root := get_node !e !root;
-    e := jouer_coup_avec_mcts !root 5000 1.41;
+    print_grid !e.grid;
+    jouer_adversaire ();
     k := !k + 1;
-    (* Afficher la grille après le coup de l'IA *)
-    print_grid (!e).grid;
-    root := get_node !e !root;
-
-    (* SOI *)
-    (* let c = next_move() in
-    e_precedent := !e;
-    e := joue (!e) c (!k);
-    k := !k +1; *)
-
-    (* RANDOM *)
-    (* e_precedent := !e;
-    e := random_next_state !e;
-    k := !k + 1;
-    (* Afficher la grille après le coup *)
-    print_grid (!e).grid; *)
-
-    (* pour utiliser la seconde heuristique remplacer heuristique par : (fun p e1 -> heuristique_v2 p e1 (!e)) *)
-
-    (* MinMax joue *)
-    (* e_intermediaire := !e; *)
-    e := meilleur_coup_2 !e d Minf Pinf heuristique ;
-    (* e_precedent := !e_intermediaire; *)
-    k := !k + 1;
-
-    print_grid (!e).grid;
-    print_newline ();
-
-    (* print_int (heuristique_v2 !e_precedent.player !e !e_precedent);
-    print_string "\t";
-    print_int (heuristique !e_precedent.player !e_precedent);
-    print_newline ();
-    flush stdout; *)
-    (* print_node !root; *) 
-
+    print_grid !e.grid;
+    joueur_commence := not !joueur_commence; (* Correction ici *)
   done;
 
-  (* Afficher le gagnant *)
-  afficher_gagnant (!e)
-
-
-
-
-
-
-
-
-(* let grille_test = Array.make_matrix 9 9 Vide
-let ge_test = Array.make_matrix 3 3 None
-
-
-let rep = ref (init 1 1) *)
-
-(* let () =
-  (* let d = 5 in *)
-  let e = ref (init 1 1) in
-  let k = ref 0 in
-
-  (* mcts vs moi *)
-  mcts root 2 1.41;  (* 10000 itérations et C = 1.41 pour l'UCT *)
-  let best_move = ref (best_child root) in
-  (* Utiliser best_move pour décider du prochain mouvement *)
-  while ((est_gagnant (!e)) = None) && ((!k)< 81) do
-    begin
-    print_grid (!e).grid;
-    e := (!best_move).state;
-    k := !k +1;
-    print_grid (!e).grid;
-    let c = next_move() in
-    e := joue (!e) c (!k);
-    k := !k +1;
-    best_move := best_child (!best_move);
-    end
-  done *)
-
-
-  (* minmax vs minmax elagage heuristique 1 *)
-  (* let d=5 in
-  while ((est_gagnant (!e)) = None) && ((!k)< 81) do
-    begin
-    e := meilleur_coup_2 !e d Minf Pinf;
-    k := !k +1;
-    print_grid (!e).grid;
-    end
-  done;
-  afficher_gagnant !e *)
-  
-  (* heuristique 1 minmax contre soi *)
-  (* while ((est_gagnant (!e)) = None) && ((!k)< 81) do
-    begin
-    let c = next_move() in
-    e := joue (!e) c (!k);
-    k := !k +1;
-    e := meilleur_coup !e d;
-    k := !k +1;
-    print_grid (!e).grid;
-    end
-  done *)
-
-  (* heuristique 1 min max contre le nul *)
-  (* while ((est_gagnant (!e)) = None) && ((!k)< 81) do
-    begin
-    e := List.hd (possible_moves !e);
-    k := !k +1;
-    e := meilleur_coup !e d;
-    k := !k +1;
-    print_grid (!e).grid;
-    end
-  done *)
-
-  (* soi contre le nul *)
-  (* while ((est_gagnant (!e)) = None) && ((!k)< 81) do
-    begin
-    e := List.hd (possible_moves !e);
-    k := !k +1;
-    print_grid (!e).grid;
-    let c = next_move() in
-    e := joue (!e) c (!k);
-    k := !k +1;
-    end
-  done *)
-
-
-
+  afficher_gagnant !e
