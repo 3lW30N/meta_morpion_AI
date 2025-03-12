@@ -20,11 +20,11 @@ Il est important d'analyser non seulement l’état local de chaque morpion, mai
 
 ## Stratégies gagnantes
 
-Si le premier joueur commence par jouer dans la case centrale de la grille centrale, une stratégie gagnantes existe déjà.
+Si le premier joueur commence par jouer dans la case centrale de la grille centrale, une stratégie gagnante existe déjà.
 
 J'ai essayé de voir si mon programme pouvait retrouver cette stratégie gagnante, ce qui pourrait valider son efficacité, mais j'ai aussi essayé d'empêcher ce coup pour voir si de nouvelles stratégies émergeaient.
 
-Il n'y a pas encore de statistiques sur taux les victoires de mes deux modèles car beaucoup de paramètres différents peuvent être choisis et avoir une influence dans le résultat.
+Il n'y a pas encore de statistiques sur taux les victoires de mes deux modèles car beaucoup de paramètres différents peuvent être choisis et avoir une influence sur le résultat.
 
 ## To do
 
